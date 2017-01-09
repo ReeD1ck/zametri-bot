@@ -1,0 +1,26 @@
+{
+  "name": "notesbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bifot/NotesBot.git"
+  },
+  "keywords": [
+    "telegram"
+  ],
+  "author": "Mikhail Semin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bifot/NotesBot/issues"
+  },
+  "homepage": "https://github.com/bifot/NotesBot#readme",
+  "dependencies": {
+    "mongodb": "^2.2.19",
+    "node-telegram-bot-api": "^0.25.0"
+  }
+}
