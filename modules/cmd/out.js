@@ -7,16 +7,14 @@ module.exports = (bot, config, assert, MongoClient) => {
         assert.equal(null, err);
 
         var notes = db.collection('notes');
-        var allNotes = [];
+        var record = [];
 
         notes.find().toArray((err, results) => {
-          for (var userId in results) {
-            if (results[userId]) {
-              allNotes.push(results[userId][msg.from.id]);
-            }
-          }
+          results.forEach(note => {
+            if (note) record.push(note[msg.from.id]);
+          });
 
-          resolve(allNotes[allNotes.length - 1]);
+          resolve(record[record.length - 1]);
         });
 
         setTimeout(() => reject('Ошибка при выводе информации.'), 1000);
