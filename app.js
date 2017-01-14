@@ -21,9 +21,9 @@ bot.on('message', msg => {
   // Мониторинг сообщений
   console.log(`Пользователь ${msg.from.first_name} ${msg.from.last_name} (@${msg.from.username}) написал «${msg.text}»`);
 
-  if (msg.text == "/start")
+  if (msg.text == '/start')
     start.cmd(msg);
-  else if (msg.text == "/help")
+  else if (msg.text == '/help')
     help.cmd(msg);
   else if (msg.text == config.enter)
     enter.cmd(msg, urlDb);
