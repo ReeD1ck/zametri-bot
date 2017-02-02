@@ -46,5 +46,5 @@ bot.on('message', msg => {
 });
 
 bot.on('callback_query', msg => {
-  adminKeyboard();
+  adminKeyboard(msg);
 });
