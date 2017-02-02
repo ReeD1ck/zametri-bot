@@ -1,5 +1,4 @@
 {
-  "enter": "Ввести информацию",
-  "out": "Вывести информацию",
-  "token": ""
+  "token": "token_is_here",
+  "db_url": "mongodb://localhost:27017/notes"
 }

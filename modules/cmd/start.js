@@ -1,23 +1,27 @@
-module.exports = (bot, config, db, assert) => {
-  var module = {};
+const TelegramBot = require('node-telegram-bot-api');
+const config = require('../../config');
+const mongoose = require('mongoose');
+const Users = require('../db/users_model');
 
-  module.cmd = (msg) => {
-    var settings = {
-      parse_mode: 'markdown',
-      reply_markup: JSON.stringify({
-        keyboard: [
-          [config.enter],
-          [config.out]
-        ]
-      })
-    };
+const bot = new TelegramBot(config.token, { polling: false });
 
-    var userFirstName = msg.from.first_name || '';
-    var userLastName = msg.from.last_name || '';
-    var userUserName = msg.from.username;
+module.exports = (msg) => {
+  mongoose.connect(config.db_url);
 
-    bot.sendMessage(msg.from.id, `*Здравствуйте, ${userFirstName} ${userLastName}!*\n\n С помощью этого вы можете делать заметки.`, settings);
+  var data = { id: msg.from.id };
+  var new_user = new Users(data);
+
+  Users.find({ id: data.id }, (err, results) => {
+    if (!results[0]) {
+      new_user.save();
+    }
+  });
+
+  mongoose.connection.close();
+
+  var settings = {
+    parse_mode: 'markdown'
   };
 
-  return module;
+  bot.sendMessage(msg.from.id, `*Привет!*\n\nЧтобы записать заметку, просто напишите что-то этому боту, он автоматически сохраняет все сообщения.\n\nДля выводы используйте команду /get.`, settings);
 };
