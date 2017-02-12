@@ -9,7 +9,7 @@ module.exports = (msg, id) => {
   mongoose.connect(config.db_url);
 
   Notes.find({ _id: id }, (err, results) => {
-    if (!err && results) {
+    if (!err && results[0]) {
       var item = results[0];
       var button = `delete_note?${id}`;
 
