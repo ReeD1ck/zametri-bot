@@ -13,8 +13,8 @@ const write = require('./modules/cmd/write');
 
 const bot = new TelegramBot(config.token, { polling: true });
 
-global._TITLES = [];
-global._INFO = [];
+global.titles = [];
+global.info = [];
 
 const isNoteReal = (arr, cond, callback) => {
   arr.forEach(item => {
@@ -28,16 +28,14 @@ bot.on('message', msg => {
   // Мониторинг сообщений
   console.log(`Пользователь ${msg.from.first_name} ${msg.from.last_name} (@${msg.from.username}) написал «${msg.text}»`);
 
-  // console.log(_TITLES);
-
   if (msg.text == '/start') {
     start(msg);
   } else if (msg.text == '/get') {
     get(msg);
   } else if (msg.text == '/admin' && msg.from.id == 91990226) {
     admin(msg);
-  } else if (_TITLES.indexOf(msg.text) != -1) {
-    isNoteReal(_INFO, msg.text, (id) => {
+  } else if (titles.indexOf(msg.text) != -1) {
+    isNoteReal(info, msg.text, (id) => {
       out(msg, id);
     });
   } else {

@@ -43,8 +43,8 @@ module.exports = (msg) => {
 
           keyboard.push(button);
           
-          _TITLES.push(buttonText);
-          _INFO.push({
+          titles.push(buttonText);
+          info.push({
             text: buttonText,
             id: note._id
           });

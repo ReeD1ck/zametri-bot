@@ -43,7 +43,7 @@ module.exports = (msg) => {
 
   new_note.save((err, results) => {
     if (!err) {
-      bot.sendMessage(msg.from.id, 'Заметка успешно записана.');
+      bot.sendMessage(msg.from.id, 'Заметка успешно записана. Наберите /get, чтобы посмотреть записанные заметки.');
     } else {
       bot.sendMessage(msg.from.id, 'При записи произошла ошибка.');
     }
