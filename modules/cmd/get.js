@@ -26,25 +26,19 @@ module.exports = (msg) => {
         var keyboard = [];
 
         items.forEach(note => {
-          var button = [];
+          var buttons = [];
+          var button = {};
 
-          if (note.content.type == 'text') {
-            var buttonText = (note.content.inner.length >= 50) ? `${note.content.inner.substr(0, 50)}... (note_id:${note._id})` : `${note.content.inner} (note_id:${note._id})`;
-
-            button.push(buttonText);
-          } else {
-            var buttonText = `${rightTypeAttach(note.content.type)} от ${note.date} (id: ${note.content.inner.substr(0, 10)})`;
-
-            button.push(buttonText);
+          if (note.content.type == 'text') {           
+            button.text = (note.content.inner.length >= 50) ? `${note.content.inner.substr(0, 50)}...` : note.content.inner;
+            button.callback_data = `get_note?${note._id}`;
+          } else {           
+            button.text = `${rightTypeAttach(note.content.type)} ${note.date}`;
+            button.callback_data = `get_note?${note._id}`;
           }
 
-          keyboard.push(button);
-          
-          titles.push(buttonText);
-          info.push({
-            text: buttonText,
-            id: note._id
-          });
+          buttons.push(button);
+          keyboard.push(buttons);
         });
 
         resolve(keyboard);
@@ -59,8 +53,7 @@ module.exports = (msg) => {
       var settings = {
         parse_mode: 'markdown',
         reply_markup: JSON.stringify({
-          one_time_keyboard: true,
-          keyboard: keyboard
+          inline_keyboard: keyboard          
         })
       };
 

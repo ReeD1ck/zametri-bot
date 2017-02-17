@@ -7,8 +7,6 @@ const bot = new TelegramBot(config.token, { polling: true });
 module.exports = (msg, id) => {
   db.notes.find({ _id: id }, (err, results) => {
     if (!err && results[0]) {
-      console.log(results);
-
       var item = results[0];
       var button = `delete_note?${id}`;
 
@@ -38,7 +36,7 @@ module.exports = (msg, id) => {
         bot.sendDocument(msg.from.id, item.content.inner, settings);
       }
     } else {
-      console.log(err);
+      bot.sendMessage(msg.from.id, 'Произошла какая-то ошибка. Вероятно, заметка удалена или у @bifot кривые руки.');
     }
   });
 };

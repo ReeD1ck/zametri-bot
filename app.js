@@ -11,21 +11,6 @@ const write = require('./modules/cmd/write');
 
 const bot = new TelegramBot(config.token, { polling: true });
 
-global.titles = [];
-global.info = [];
-
-const isNoteReal = (arr, cond, callback) => {
-  arr.forEach(item => {
-    if (item.text == cond) {
-      console.log(item);
-
-      callback(item.id);
-
-      return item.text != cond;
-    }
-  });
-};
-
 bot.on('message', msg => {
   // Мониторинг сообщений
   console.log(`Пользователь ${msg.from.first_name} ${msg.from.last_name} (@${msg.from.username}) написал «${msg.text}»`);
@@ -36,24 +21,17 @@ bot.on('message', msg => {
     get(msg);
   } else if (msg.text == '/admin' && msg.from.id == 91990226) {
     admin(msg);
-  } else if (msg.text.split('note_id:')) {
-    var id = msg.text.split('note_id:')[1].substr(0, msg.text.split('note_id:')[1].length - 1);
-
-    console.log(id);
-
-    db.notes.find({ _id: id }, (err, results) => {
-      if (!err && results[0]) {
-        console.log(results);
-
-        out(msg, results[0]);
-      }
-    });
-
   } else {
     write(msg);
   }
 });
 
 bot.on('callback_query', msg => {
-  adminKeyboard(msg);
+  if (msg.data.match('get_note')) {
+    var id = msg.data.split('?')[1];
+
+    out(msg, id);
+  } else {
+    adminKeyboard(msg);
+  }
 });
