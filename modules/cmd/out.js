@@ -1,20 +1,17 @@
 const TelegramBot = require('node-telegram-bot-api');
 const config = require('../../config');
-const mongoose = require('mongoose');
-const Notes = require('../db/notes_model');
+const database = require('../db/db');
 
-const bot = new TelegramBot(config.token, { polling: false });
+const bot = new TelegramBot(config.token, { polling: true });
 
 module.exports = (msg, id) => {
-  mongoose.connect(config.db_url);
-
-  Notes.find({ _id: id }, (err, results) => {
+  db.notes.find({ _id: id }, (err, results) => {
     if (!err && results[0]) {
       var item = results[0];
       var button = `delete_note?${id}`;
 
       var settings = {
-        parse_mode: 'markdown',
+        parse_mode: 'HTML',
         reply_markup: JSON.stringify({
           inline_keyboard: [
             [{
@@ -26,7 +23,7 @@ module.exports = (msg, id) => {
       };
 
       if (item.content.type == 'text') {
-        bot.sendMessage(msg.from.id, `*Заметка от ${item.date}*\n\n${item.content.inner}`, settings);
+        bot.sendMessage(msg.from.id, `<b>Заметка от ${item.date}</b>\n\n${item.content.inner}`, settings);
       } else if (item.content.type == 'sticker') {
         bot.sendSticker(msg.from.id, item.content.inner, settings);
       } else if (item.content.type == 'photo') {
@@ -39,9 +36,7 @@ module.exports = (msg, id) => {
         bot.sendDocument(msg.from.id, item.content.inner, settings);
       }
     } else {
-      console.log(err);
+      bot.sendMessage(msg.from.id, 'Произошла какая-то ошибка. Вероятно, заметка удалена или у @bifot кривые руки.');
     }
   });
-
-  mongoose.connection.close();
 };

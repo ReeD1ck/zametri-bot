@@ -1,8 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const config = require('./config');
-const mongoose = require('mongoose');
-const Users = require('./modules/db/users_model');
-const Notes = require('./modules/db/notes_model');
+const database = require('./modules/db/db');
 
 const start = require('./modules/cmd/start');
 const get = require('./modules/cmd/get');
@@ -12,17 +10,6 @@ const adminKeyboard = require('./modules/cmd/adminKeyboard');
 const write = require('./modules/cmd/write');
 
 const bot = new TelegramBot(config.token, { polling: true });
-
-global.titles = [];
-global.info = [];
-
-const isNoteReal = (arr, cond, callback) => {
-  arr.forEach(item => {
-    if (item.text == cond) {
-      callback(item.id);
-    }
-  });
-};
 
 bot.on('message', msg => {
   // Мониторинг сообщений
@@ -34,15 +21,17 @@ bot.on('message', msg => {
     get(msg);
   } else if (msg.text == '/admin' && msg.from.id == 91990226) {
     admin(msg);
-  } else if (titles.indexOf(msg.text) != -1) {
-    isNoteReal(info, msg.text, (id) => {
-      out(msg, id);
-    });
   } else {
     write(msg);
   }
 });
 
 bot.on('callback_query', msg => {
-  adminKeyboard(msg);
+  if (msg.data.match('get_note')) {
+    var id = msg.data.split('?')[1];
+
+    out(msg, id);
+  } else {
+    adminKeyboard(msg);
+  }
 });

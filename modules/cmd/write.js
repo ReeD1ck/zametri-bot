@@ -1,7 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const config = require('../../config');
-const mongoose = require('mongoose');
-const Notes = require('../db/notes_model');
+const database = require('../db/db');
 
 const bot = new TelegramBot(config.token, { polling: false });
 
@@ -31,23 +30,19 @@ module.exports = (msg) => {
   var date = new Date();
   var today = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
 
-  mongoose.connect(config.db_url);
-
   var data = {
     id: msg.from.id,
     content: message,
     date: today
   };
 
-  var new_note = new Notes(data);
+  var note = new db.notes(data);
 
-  new_note.save((err, results) => {
+  note.save((err, results) => {
     if (!err) {
       bot.sendMessage(msg.from.id, 'Заметка успешно записана. Наберите /get, чтобы посмотреть записанные заметки.');
     } else {
       bot.sendMessage(msg.from.id, 'При записи произошла ошибка.');
     }
   });
-
-  mongoose.connection.close();
 };

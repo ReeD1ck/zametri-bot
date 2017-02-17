@@ -1,7 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const config = require('../../config');
-const mongoose = require('mongoose');
-const Notes = require('../db/notes_model');
+const database = require('../db/db');
 
 const bot = new TelegramBot(config.token, { polling: false });
 
@@ -21,33 +20,25 @@ module.exports = (msg) => {
   };
 
   const getButtons = new Promise((resolve, reject) => {
-    mongoose.connect(config.db_url);
-
-    Notes.find({ id: msg.from.id }, (err, results) => {
+    db.notes.find({ id: msg.from.id }, (err, results) => {
       if (!err && results.length) {
         var items = results;
         var keyboard = [];
 
         items.forEach(note => {
-          var button = [];
+          var buttons = [];
+          var button = {};
 
-          if (note.content.type == 'text') {
-            var buttonText = (note.content.inner.length >= 50) ? `${note.content.inner.substr(0, 50)}...` : note.content.inner;
-
-            button.push(buttonText);
-          } else {
-            var buttonText = `${rightTypeAttach(note.content.type)} от ${note.date} (id: ${note.content.inner.substr(0, 10)})`;
-
-            button.push(buttonText);
+          if (note.content.type == 'text') {           
+            button.text = (note.content.inner.length >= 50) ? `${note.content.inner.substr(0, 50)}...` : note.content.inner;
+            button.callback_data = `get_note?${note._id}`;
+          } else {           
+            button.text = `${rightTypeAttach(note.content.type)} ${note.date}`;
+            button.callback_data = `get_note?${note._id}`;
           }
 
-          keyboard.push(button);
-          
-          titles.push(buttonText);
-          info.push({
-            text: buttonText,
-            id: note._id
-          });
+          buttons.push(button);
+          keyboard.push(buttons);
         });
 
         resolve(keyboard);
@@ -55,8 +46,6 @@ module.exports = (msg) => {
         reject('Заметок пока что нет. Сделайте запись, просто написав мне что-то.');
       }
     });
-
-    mongoose.connection.close();
   });
 
   getButtons
@@ -64,14 +53,15 @@ module.exports = (msg) => {
       var settings = {
         parse_mode: 'markdown',
         reply_markup: JSON.stringify({
-          one_time_keyboard: true,
-          keyboard: keyboard
+          inline_keyboard: keyboard          
         })
       };
 
       bot.sendMessage(msg.from.id, 'Выберите нужную заметку.', settings);
     })
     .catch(err => {
-      bot.sendMessage(msg.from.id, err);
+      console.log(err);
+
+      bot.sendMessage(msg.from.id, 'err');
     });
 };
