@@ -1,7 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const config = require('../../config');
-const mongoose = require('mongoose');
-const Notes = require('../db/notes_model');
+const database = require('../db/db');
 
 const bot = new TelegramBot(config.token, { polling: false });
 
@@ -21,9 +20,7 @@ module.exports = (msg) => {
   };
 
   const getButtons = new Promise((resolve, reject) => {
-    mongoose.connect(config.db_url);
-
-    Notes.find({ id: msg.from.id }, (err, results) => {
+    db.notes.find({ id: msg.from.id }, (err, results) => {
       if (!err && results.length) {
         var items = results;
         var keyboard = [];
@@ -32,7 +29,7 @@ module.exports = (msg) => {
           var button = [];
 
           if (note.content.type == 'text') {
-            var buttonText = (note.content.inner.length >= 50) ? `${note.content.inner.substr(0, 50)}...` : note.content.inner;
+            var buttonText = (note.content.inner.length >= 50) ? `${note.content.inner.substr(0, 50)}... (note_id:${note._id})` : `${note.content.inner} (note_id:${note._id})`;
 
             button.push(buttonText);
           } else {
@@ -55,8 +52,6 @@ module.exports = (msg) => {
         reject('Заметок пока что нет. Сделайте запись, просто написав мне что-то.');
       }
     });
-
-    mongoose.connection.close();
   });
 
   getButtons
@@ -72,6 +67,8 @@ module.exports = (msg) => {
       bot.sendMessage(msg.from.id, 'Выберите нужную заметку.', settings);
     })
     .catch(err => {
-      bot.sendMessage(msg.from.id, err);
+      console.log(err);
+
+      bot.sendMessage(msg.from.id, 'err');
     });
 };

@@ -1,8 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const config = require('./config');
-const mongoose = require('mongoose');
-const Users = require('./modules/db/users_model');
-const Notes = require('./modules/db/notes_model');
+const database = require('./modules/db/db');
 
 const start = require('./modules/cmd/start');
 const get = require('./modules/cmd/get');
@@ -19,7 +17,11 @@ global.info = [];
 const isNoteReal = (arr, cond, callback) => {
   arr.forEach(item => {
     if (item.text == cond) {
+      console.log(item);
+
       callback(item.id);
+
+      return item.text != cond;
     }
   });
 };
@@ -34,10 +36,19 @@ bot.on('message', msg => {
     get(msg);
   } else if (msg.text == '/admin' && msg.from.id == 91990226) {
     admin(msg);
-  } else if (titles.indexOf(msg.text) != -1) {
-    isNoteReal(info, msg.text, (id) => {
-      out(msg, id);
+  } else if (msg.text.split('note_id:')) {
+    var id = msg.text.split('note_id:')[1].substr(0, msg.text.split('note_id:')[1].length - 1);
+
+    console.log(id);
+
+    db.notes.find({ _id: id }, (err, results) => {
+      if (!err && results[0]) {
+        console.log(results);
+
+        out(msg, results[0]);
+      }
     });
+
   } else {
     write(msg);
   }
