@@ -10,7 +10,7 @@ var del = require('./modules/cmd/delete');
 
 var app = new Telegraf(config.token);
 
-// app.use(Telegraf.log());
+app.use(Telegraf.log());
 
 app.command('start', ctx => start(ctx));
 app.command('get', ctx => get(ctx));
@@ -20,4 +20,4 @@ app.action(/delete_note/, ctx => del(ctx));
 
 app.on('message', ctx => write(ctx));
 
-app.startPolling()
+app.startPolling();
