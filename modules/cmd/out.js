@@ -1,42 +1,40 @@
-const TelegramBot = require('node-telegram-bot-api');
-const config = require('../../config');
-const database = require('../db/db');
+var { Extra,  Markup } = require('telegraf');
+var config = require('../../config');
+var database = require('../db/db');
 
-const bot = new TelegramBot(config.token, { polling: true });
+module.exports = ctx => {
+  var data = ctx.callbackQuery.data;
+  var id = data.split('?')[1];
 
-module.exports = (msg, id) => {
-  db.notes.find({ _id: id }, (err, results) => {
-    if (!err && results[0]) {
-      var item = results[0];
-      var button = `delete_note?${id}`;
+  db.notes.find({ _id: id }).then(results => {
+    var item = results[0];
+    var del = `delete_note?${id}`;
+    var settings = Extra
+      .HTML()
+      .markup(m =>
+        m.inlineKeyboard([
+          m.callbackButton('Удалить', del)
+        ]));
 
-      var settings = {
-        parse_mode: 'HTML',
-        reply_markup: JSON.stringify({
-          inline_keyboard: [
-            [{
-              text: 'Удалить заметку',
-              callback_data: button
-            }]
-          ]
-        })
-      };
-
-      if (item.content.type == 'text') {
-        bot.sendMessage(msg.from.id, `<b>Заметка от ${item.date}</b>\n\n${item.content.inner}`, settings);
-      } else if (item.content.type == 'sticker') {
-        bot.sendSticker(msg.from.id, item.content.inner, settings);
-      } else if (item.content.type == 'photo') {
-        bot.sendPhoto(msg.from.id, item.content.inner, settings);
-      } else if (item.content.type == 'video') {
-        bot.sendVideo(msg.from.id, item.content.inner, settings);
-      } else if (item.content.type == 'voice') {
-        bot.sendVoice(msg.from.id, item.content.inner, settings);
-      } else {
-        bot.sendDocument(msg.from.id, item.content.inner, settings);
-      }
+    if (item.content.type == 'text') {
+      ctx.reply(`<b>Заметка от ${item.date}</b>\n\n${item.content.inner}`, settings);
+    } else if (item.content.type == 'sticker') {
+      ctx.replyWithSticker(item.content.inner, settings);
+    } else if (item.content.type == 'photo') {
+      ctx.replyWithPhoto(item.content.inner, { caption: item.content.caption, reply_markup: JSON.stringify({
+        inline_keyboard: [[{
+          text: 'Удалить',
+          callback_data: del
+        }]]
+      })});
+    } else if (item.content.type == 'video') {
+      ctx.replyWithVideo(item.content.inner, settings);
+    } else if (item.content.type == 'voice') {
+      ctx.replyWithVoice(item.content.inner, settings);
     } else {
-      bot.sendMessage(msg.from.id, 'Произошла какая-то ошибка. Вероятно, заметка удалена или у @bifot кривые руки.');
+      ctx.replyWithDocument(item.content.inner, settings);
     }
-  });
+  }).catch(e => {
+    ctx.reply(`*Произошла ошибка:*\n\n ${e.toString()}`, Extra.markdown());
+  })
 };

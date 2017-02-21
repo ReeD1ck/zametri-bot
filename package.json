@@ -1,10 +1,10 @@
 {
   "name": "notesbot",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "bot.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node bot.js"
   },
   "repository": {
     "type": "git",
@@ -20,8 +20,9 @@
   },
   "homepage": "https://github.com/bifot/NotesBot#readme",
   "dependencies": {
+    "moment": "2.17.1",
     "mongodb": "^2.2.19",
     "mongoose": "4.8.1",
-    "node-telegram-bot-api": "^0.25.0"
+    "telegraf": "3.6.6"
   }
 }

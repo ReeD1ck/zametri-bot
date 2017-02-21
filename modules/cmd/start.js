@@ -1,23 +1,14 @@
-const TelegramBot = require('node-telegram-bot-api');
-const config = require('../../config');
-const database = require('../db/db');
+var { Extra, Markup } = require('telegraf');
+var config = require('../../config');
+var database = require('../db/db');
 
-const bot = new TelegramBot(config.token, { polling: false });
+module.exports = ctx => {
+  var data = { id: ctx.from.id };
+  var user = new db.users(data);
 
-module.exports = (msg) => {
-  var data = { id: msg.from.id };
-
-  db.users.find({ id: data.id }, (err, results) => {
-    if (!results[0]) {
-      var user = new db.users(data);
-
-      user.save();
-    }
+  db.users.find({ id: data.id }).then(results => {
+    if (!results[0]) user.save();
   });
 
-  var settings = {
-    parse_mode: 'markdown'
-  };
-
-  bot.sendMessage(msg.from.id, `*Привет!*\n\nЧтобы записать заметку, просто напишите что-то этому боту, он автоматически сохраняет все сообщения.\n\nДля выводы используйте команду /get.`, settings);
+  ctx.reply(`*Привет!*\n\nЧтобы записать заметку, просто напишите что-то этому боту, он автоматически сохраняет все сообщения.\n\nДля выводы используйте команду /get.`, Extra.markdown());
 };

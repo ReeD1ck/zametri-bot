@@ -1,40 +1,36 @@
-const TelegramBot = require('node-telegram-bot-api');
-const config = require('../../config');
-const database = require('../db/db');
+var { Extra, Markup } = require('telegraf');
+var config = require('../../config');
+var database = require('../db/db');
 
-const bot = new TelegramBot(config.token, { polling: false });
-
-module.exports = (msg) => {
-  const rightTypeAttach = word => {
-    if (word == 'sticker') {
+module.exports = ctx => {
+  var attachmentType = attachment => {
+    if (attachment == 'sticker') {
       return 'Стикер';
-    } else if (word == 'photo') {
+    } else if (attachment == 'photo') {
       return 'Фотография';
-    } else if (word == 'video') {
+    } else if (attachment == 'video') {
       return 'Видео';
-    } else if (word == 'voice') {
+    } else if (attachment == 'voice') {
       return 'Голосовое сообщение';
     } else {
       return 'Документ';
     }
   };
 
-  const getButtons = new Promise((resolve, reject) => {
-    db.notes.find({ id: msg.from.id }, (err, results) => {
-      if (!err && results.length) {
-        var items = results;
+  var getKeyboard = new Promise((resolve, reject) => {
+    db.notes.find({ id: ctx.from.id }).then(results => {
         var keyboard = [];
 
-        items.forEach(note => {
+        results.forEach(item => {
           var buttons = [];
           var button = {};
 
-          if (note.content.type == 'text') {           
-            button.text = (note.content.inner.length >= 50) ? `${note.content.inner.substr(0, 50)}...` : note.content.inner;
-            button.callback_data = `get_note?${note._id}`;
-          } else {           
-            button.text = `${rightTypeAttach(note.content.type)} ${note.date}`;
-            button.callback_data = `get_note?${note._id}`;
+          if (item.content.type == 'text') {
+            button.text = (item.content.inner.length >= 50) ? `${item.content.inner.substr(0, 50)}...` : item.content.inner;
+            button.callback_data = `get_note?${item._id}`;
+          } else {
+            button.text = `${attachmentType(item.content.type)} ${item.date}`;
+            button.callback_data = `get_note?${item._id}`;
           }
 
           buttons.push(button);
@@ -42,26 +38,20 @@ module.exports = (msg) => {
         });
 
         resolve(keyboard);
-      } else {
-        reject('Заметок пока что нет. Сделайте запись, просто написав мне что-то.');
-      }
-    });
+      }).catch(e => {
+        reject(err);
+      });
   });
 
-  getButtons
-    .then(keyboard => {
-      var settings = {
-        parse_mode: 'markdown',
-        reply_markup: JSON.stringify({
-          inline_keyboard: keyboard          
-        })
-      };
+  getKeyboard.then(keyboard => {
+    var settings = {
+      reply_markup: JSON.stringify({
+        inline_keyboard: keyboard
+      })
+    };
 
-      bot.sendMessage(msg.from.id, 'Выберите нужную заметку.', settings);
-    })
-    .catch(err => {
-      console.log(err);
-
-      bot.sendMessage(msg.from.id, 'err');
-    });
+    ctx.reply('Выберите заметку:', settings);
+  }).catch(e => {
+    ctx.reply(`*Произошла ошибка:*\n\n ${e.toString()}`, Extra.markdown());
+  });
 };
