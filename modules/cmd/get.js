@@ -26,7 +26,7 @@ module.exports = ctx => {
           var button = {};
 
           if (item.content.type == 'text') {
-            button.text = (item.content.inner.length >= 50) ? `${item.content.inner.substr(0, 50)}...` : item.content.inner;
+            button.text = (item.content.inner.split('\n')[0].length >= 50) ? `${item.content.inner.split('\n')[0].substr(0, 50)}...` : item.content.inner.split('\n')[0];
             button.callback_data = `get_note?${item._id}`;
           } else {
             button.text = `${attachmentType(item.content.type)} ${item.date}`;
