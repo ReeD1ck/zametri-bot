@@ -3,6 +3,7 @@ var { Extra, Markup } = Telegraf;
 var config = require('./config');
 
 var start = require('./modules/cmd/start');
+var help = require('./modules/cmd/help');
 var get = require('./modules/cmd/get');
 var out = require('./modules/cmd/out');
 var write = require('./modules/cmd/write');
@@ -13,6 +14,7 @@ var app = new Telegraf(config.token);
 app.use(Telegraf.log());
 
 app.command('start', ctx => start(ctx));
+app.command('help', ctx => help(ctx));
 app.command('get', ctx => get(ctx));
 
 app.action(/get_note/, ctx => out(ctx));
