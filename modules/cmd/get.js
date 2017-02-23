@@ -29,7 +29,11 @@ module.exports = ctx => {
             button.text = (item.content.inner.split('\n')[0].length >= 40) ? `${item.content.inner.split('\n')[0].substr(0, 40)}...` : item.content.inner.split('\n')[0];
             button.callback_data = `get_note?${item._id}`;
           } else {
-            button.text = `${attachmentType(item.content.type)} ${item.date}`;
+            var caption;
+
+            if (item.content.caption) caption = (item.content.caption.split('\n')[0].length >= 40) ? `${item.content.caption.split('\n')[0].substr(0, 40)}...` : item.content.caption.split('\n')[0];
+
+            button.text = caption || `${attachmentType(item.content.type)} ${item.date}`;
             button.callback_data = `get_note?${item._id}`;
           }
 
@@ -38,9 +42,7 @@ module.exports = ctx => {
         });
 
         resolve(keyboard);
-      }).catch(e => {
-        reject(err);
-      });
+      }).catch(reject);
   });
 
   getKeyboard.then(keyboard => {
