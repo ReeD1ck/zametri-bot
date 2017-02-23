@@ -1,34 +1,14 @@
-// dev...
+var { Extra, Markup } = require('telegraf');
+var config = require('../../config');
 
-// const TelegramBot = require('node-telegram-bot-api');
-// const config = require('../../config');
-//
-// const bot = new TelegramBot(config.token, { polling: false });
-//
-// module.exports = (msg) => {
-//   var settings = {
-//     reply_markup: JSON.stringify({
-//       inline_keyboard: [
-//         [{
-//           text: 'Содержимое Users',
-//           callback_data: 'check_bd?users'
-//         }, {
-//           text: 'Содержимое Notes',
-//           callback_data: 'check_bd?notes'
-//         }], [{
-//           text: 'Очистить Users',
-//           callback_data: 'delete_bd?users'
-//         }, {
-//           text: 'Очистить Notes',
-//           callback_data: 'delete_bd?notes'
-//         }],
-//         [{
-//           text: 'Активные пользователи',
-//           callback_data: 'active_users'
-//         }]
-//       ]
-//     })
-//   };
-//
-//   bot.sendMessage(msg.from.id, 'Что нужно сделать?', settings);
-// };
+module.exports = ctx => {
+  ctx.reply('Что нужно сделать?', Markup
+    .inlineKeyboard([
+  	  Markup.callbackButton('Содержимое Users', 'check_bd?users'),
+  	  Markup.callbackButton('Содержимое Notes', 'check_bd?notes'),
+  	  Markup.callbackButton('Очистить Users', 'delete_bd?users'),
+  	  Markup.callbackButton('Очистить Notes', 'delete_bd?notes'),
+  	  Markup.callbackButton('Пользователи', 'active_users')
+    ], { columns: 2 })
+    .extra());
+};
