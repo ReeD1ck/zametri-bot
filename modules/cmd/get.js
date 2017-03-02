@@ -55,5 +55,7 @@ module.exports = ctx => {
     ctx.reply('Выберите заметку:', settings);
   }).catch(e => {
     ctx.reply(`*Произошла ошибка:*\n\n ${e.toString()}`, Extra.markdown());
+
+    console.log(e);
   });
 };
