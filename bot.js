@@ -17,17 +17,17 @@ var app = new Telegraf(config.token);
 
 // app.use(Telegraf.log());
 
-app.command('start', ctx => start(ctx));
-app.command('help', ctx => help(ctx));
-app.command('get', ctx => get(ctx));
-app.command('admin', ctx => admin(ctx));
+app.command('start', start);
+app.command('help', help);
+app.command('get', get);
+app.command('admin', admin);
 
-app.action(/get_note/, ctx => out(ctx));
-app.action(/delete_note/, ctx => del(ctx));
-app.action(/check_bd/, ctx => check(ctx));
-app.action(/delete_bd/, ctx => drop(ctx));
-app.action(/active_users/, ctx => users(ctx));
+app.action(/get_note/, out);
+app.action(/delete_note/, del);
+app.action(/check_bd/, check);
+app.action(/delete_bd/, drop);
+app.action(/active_users/, users);
 
-app.on('message', ctx => write(ctx));
+app.on('message', write);
 
 app.startPolling();
