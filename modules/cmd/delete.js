@@ -7,15 +7,13 @@ module.exports = ctx => {
   var id = data.split('?')[1].split('&')[0];
   var type = data.split('&type=')[1];
 
-  console.log(id, type)
-
   db.notes.find({ _id: id }).remove().then(results => {
     if (type == 'text') {
-      ctx.editMessageText('Заметка успешно удалена.').catch(console.log);
+      ctx.editMessageText('Заметка успешно удалена.');
     } else {
       ctx.reply('Заметка успешно удалена.');
     }
-  }).then(error => {
+  }).catch(error => {
     if (type == 'text') {
       ctx.editMessageText(`*Произошла ошибка:*\n\n ${error.toString()}`, Extra.markdown());
     } else {
