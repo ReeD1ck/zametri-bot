@@ -17,11 +17,9 @@ module.exports = (ctx, edit) => {
     }
   };
 
-  var keyboard;
-
   var getKeyboard = new Promise((resolve, reject) => {
     db.notes.find({ id: ctx.from.id }).then(results => {
-        keyboard = [];
+        var keyboard = [];
 
         results.forEach(item => {
           var buttons = [];
