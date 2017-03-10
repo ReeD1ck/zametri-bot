@@ -19,9 +19,10 @@ var app = new Telegraf(config.token);
 
 app.command('start', start);
 app.command('help', help);
-app.command('get', get);
 app.command('admin', admin);
+app.command('get', ctx => get(ctx, false));
 
+app.action(/get_notes/, ctx => get(ctx, true));
 app.action(/get_note/, out);
 app.action(/delete_note/, del);
 app.action(/check_bd/, check);

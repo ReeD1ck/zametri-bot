@@ -33,13 +33,13 @@ module.exports = ctx => {
             var $ = cheerio.load(body);
             var title = $('title').text();
 
-            resolve([title, url]);
+            resolve([title.replace(/\S*#(?:\[[^\]]+\]|\S+)/g, '').trim(), url]);
           } else {
             resolve(url);
           }
         });
       } else {
-        resolve(ctx.message.text);
+        resolve(ctx.message.text.replace(/\S*#(?:\[[^\]]+\]|\S+)/g, '').trim());
       }
     });
 

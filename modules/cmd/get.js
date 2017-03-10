@@ -2,7 +2,7 @@ var { Extra, Markup } = require('telegraf');
 var config = require('../../config');
 var database = require('../db/db');
 
-module.exports = ctx => {
+module.exports = (ctx, edit) => {
   var attachmentType = attachment => {
     if (attachment == 'sticker') {
       return 'Стикер';
@@ -17,9 +17,11 @@ module.exports = ctx => {
     }
   };
 
+  var keyboard;
+
   var getKeyboard = new Promise((resolve, reject) => {
     db.notes.find({ id: ctx.from.id }).then(results => {
-        var keyboard = [];
+        keyboard = [];
 
         results.forEach(item => {
           var buttons = [];
@@ -52,10 +54,12 @@ module.exports = ctx => {
       })
     };
 
-    ctx.reply('Выберите заметку:', settings);
-  }).catch(e => {
-    ctx.reply(`*Произошла ошибка:*\n\n ${e.toString()}`, Extra.markdown());
-
-    console.log(e);
+    if (edit) {
+      ctx.editMessageText('Выберите заметку.', settings);
+    } else {
+      ctx.reply('Выберите заметку.', settings);
+    }
+  }).catch(error => {
+    ctx.reply(`*Произошла ошибка:*\n\n ${error.toString()}`, Extra.markdown());
   });
 };
