@@ -7,8 +7,8 @@ module.exports = ctx => {
   var id = data.split('?')[1];
 
   db.notes.find({ _id: id }).remove().then(results => {
-    ctx.reply('Заметка успешно удалена.');
+    ctx.editMessageText('Заметка успешно удалена.');
   }).then(e => {
-    ctx.reply(`*Произошла ошибка:*\n\n ${e.toString()}`, Extra.markdown());
+    ctx.editMessageText(`*Произошла ошибка:*\n\n ${e.toString()}`, Extra.markdown());
   });
 };
