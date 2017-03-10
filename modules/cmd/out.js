@@ -8,12 +8,13 @@ module.exports = ctx => {
 
   db.notes.find({ _id: id }).then(results => {
     var item = results[0];
+    var deleteNoteData = `delete_note?${id}&type=${item.content.type}`;
     var settings = Extra
       .HTML()
       .markup(m =>
         m.inlineKeyboard([
-          m.callbackButton('Удалить заметку', `delete_note?${id}`),
-          m.callbackButton('« Вернуться назад', 'get_notes')
+          m.callbackButton('Удалить заметку', deleteNoteData),
+          m.callbackButton('« Вернуться назад', `get_notes?type=${item.content.type}`)
         ], { columns: 1 } ));
 
     if (item.content.type == 'text') {
@@ -24,7 +25,7 @@ module.exports = ctx => {
       ctx.replyWithPhoto(item.content.inner, { caption: item.content.caption, reply_markup: JSON.stringify({
         inline_keyboard: [[{
           text: 'Удалить заметку',
-          callback_data: `delete_note?${id}`
+          callback_data: deleteNoteData
         }], [{
           text: '« Вернуться назад',
           callback_data: `get_notes`
