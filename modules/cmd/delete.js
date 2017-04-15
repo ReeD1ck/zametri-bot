@@ -1,23 +1,21 @@
-var { Extra, Markup } = require('telegraf');
-var config = require('../../config');
-var database = require('../db/db');
+require('../db/db')
 
-module.exports = ctx => {
-  var data = ctx.callbackQuery.data;
-  var id = data.split('?')[1].split('&')[0];
-  var type = data.split('&type=')[1];
+module.exports = (ctx) => {
+  const data = ctx.callbackQuery.data
+  const id = data.split('?')[1].split('&')[0]
+  const type = data.split('&type=')[1]
 
   db.notes.find({ _id: id }).remove().then(results => {
     if (type == 'text') {
-      ctx.editMessageText('Заметка успешно удалена.');
+      ctx.editMessageText('Заметка успешно удалена.')
     } else {
-      ctx.reply('Заметка успешно удалена.');
+      ctx.reply('Заметка успешно удалена.')
     }
-  }).catch(error => {
+  }).catch(err => {
     if (type == 'text') {
-      ctx.editMessageText(`*Произошла ошибка:*\n\n ${error.toString()}`, Extra.markdown());
+      ctx.editMessageText(err.toString())
     } else {
-      ctx.reply(`*Произошла ошибка:*\n\n ${error.toString()}`, Extra.markdown());
+      ctx.replyWithMarkdown(`*Произошла ошибка:*\n\n ${err.toString()}`)
     }
-  });
-};
+  })
+}

@@ -1,12 +1,10 @@
-var { Extra, Markup } = require('telegraf');
-var config = require('../../config');
-var database = require('../db/db');
+require('../db/db')
 
-module.exports = ctx => {
-  var argument = ctx.callbackQuery.data.split('?')[1];
-  var collection = (argument == 'users') ? db.users : db.notes;
+module.exports = (ctx) => {
+  const argument = ctx.callbackQuery.data.split('?')[1]
+  const collection = (argument == 'users') ? db.users : db.notes
 
   collection.drop()
     .then(results => ctx.reply(results.toString()))
-    .catch(error => ctx.reply(error.toString()));
-};
+    .catch(error => ctx.reply(error.toString()))
+}

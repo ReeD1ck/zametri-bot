@@ -1,46 +1,43 @@
-var { Extra,  Markup } = require('telegraf');
-var config = require('../../config');
-var database = require('../db/db');
+const { Extra } = require('telegraf')
 
-module.exports = ctx => {
-  var data = ctx.callbackQuery.data;
-  var id = data.split('?')[1];
+require('../db/db')
+
+module.exports = (ctx) => {
+  const data = ctx.callbackQuery.data
+  const id = data.split('?')[1]
 
   db.notes.find({ _id: id }).then(results => {
-    var item = results[0];
-    var deleteNoteData = `delete_note?${id}&type=${item.content.type}`;
-    var settings = Extra
+    const item = results[0]
+    const deleteNoteData = `delete_note?${id}&type=${item.content.type}`
+    const settings = Extra
       .HTML()
       .markup(m =>
         m.inlineKeyboard([
           m.callbackButton('Удалить заметку', deleteNoteData),
           m.callbackButton('« Вернуться назад', `get_notes?type=${item.content.type}`)
-        ], { columns: 1 } ));
+        ], { columns: 1 }))
 
     if (item.content.type == 'text') {
-      ctx.editMessageText(`<b>Заметка от ${item.date}</b>\n\n${item.content.inner}`, settings);
+      ctx.editMessageText(item.content.inner, settings)
     } else if (item.content.type == 'sticker') {
-      ctx.replyWithSticker(item.content.inner, settings);
+      ctx.replyWithSticker(item.content.inner, settings)
     } else if (item.content.type == 'photo') {
-      ctx.replyWithPhoto(item.content.inner, { caption: item.content.caption, reply_markup: JSON.stringify({
-        inline_keyboard: [[{
-          text: 'Удалить заметку',
-          callback_data: deleteNoteData
-        }], [{
-          text: '« Вернуться назад',
-          callback_data: `get_notes`
-        }]]
-      })});
+      ctx.replyWithPhoto(item.content.inner, { caption: item.content.caption,
+        reply_markup: JSON.stringify({
+          inline_keyboard: [[{
+            text: 'Удалить заметку',
+            callback_data: deleteNoteData
+          }], [{
+            text: '« Вернуться назад',
+            callback_data: `get_notes`
+          }]]
+        })})
     } else if (item.content.type == 'video') {
-      ctx.replyWithVideo(item.content.inner, settings);
+      ctx.replyWithVideo(item.content.inner, settings)
     } else if (item.content.type == 'voice') {
-      ctx.replyWithVoice(item.content.inner, settings);
+      ctx.replyWithVoice(item.content.inner, settings)
     } else {
-      ctx.replyWithDocument(item.content.inner, settings);
+      ctx.replyWithDocument(item.content.inner, settings)
     }
-  }).catch(e => {
-    console.log(e)
-
-    ctx.reply(`*Произошла ошибка:*\n\n ${e.toString()}`, Extra.markdown());
-  })
-};
+  }).catch(console.log)
+}
